@@ -26,14 +26,21 @@ print(f'X_train shape: {X_train.shape}')
 print(f'y_train shape: {y_train.shape}')
 print(f'X_test shape: {X_test.shape}')
 
-# 创建CNN模型
+# 创建增强版CNN模型
 model = Sequential()
-model.add(Conv2D(16, (3, 3), activation='relu', input_shape=(28, 28, 1)))
-model.add(MaxPooling2D((2, 2)))
+model.add(Conv2D(32, (3, 3), activation='relu', input_shape=(28, 28, 1)))
 model.add(Conv2D(32, (3, 3), activation='relu'))
 model.add(MaxPooling2D((2, 2)))
+model.add(Dropout(0.25))
+
+model.add(Conv2D(64, (3, 3), activation='relu'))
+model.add(Conv2D(64, (3, 3), activation='relu'))
+model.add(MaxPooling2D((2, 2)))
+model.add(Dropout(0.25))
+
 model.add(Flatten())
-model.add(Dense(128, activation='relu'))
+model.add(Dense(256, activation='relu'))
+model.add(Dropout(0.5))
 model.add(Dense(10, activation='softmax'))
 
 print('Model summary:')
