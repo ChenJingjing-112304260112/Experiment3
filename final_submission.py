@@ -4,7 +4,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout, BatchNormalization
 from tensorflow.keras.utils import to_categorical
 
-print('=== 训练CNN模型 ===')
+print('训练优化版CNN模型...')
 
 # 加载数据
 train_df = pd.read_csv('train.csv')
@@ -14,14 +14,11 @@ X_train = train_df.drop('label', axis=1).values.reshape(-1, 28, 28, 1).astype('f
 y_train = to_categorical(train_df['label'].values, 10)
 X_test = test_df.values.reshape(-1, 28, 28, 1).astype('float32') / 255.0
 
-print(f'训练集: {X_train.shape[0]} 样本')
-print(f'测试集: {X_test.shape[0]} 样本')
-
-# 创建模型
+# 创建优化模型
 model = Sequential([
-    Conv2D(32, (3,3), activation='relu', input_shape=(28,28,1), padding='same'),
+    Conv2D(32, (5,5), activation='relu', input_shape=(28,28,1), padding='same'),
     BatchNormalization(),
-    Conv2D(32, (3,3), activation='relu', padding='same'),
+    Conv2D(32, (5,5), activation='relu', padding='same'),
     BatchNormalization(),
     MaxPooling2D(2,2),
     Dropout(0.2),
@@ -33,11 +30,6 @@ model = Sequential([
     MaxPooling2D(2,2),
     Dropout(0.3),
     
-    Conv2D(128, (3,3), activation='relu', padding='same'),
-    BatchNormalization(),
-    MaxPooling2D(2,2),
-    Dropout(0.4),
-    
     Flatten(),
     Dense(256, activation='relu'),
     BatchNormalization(),
@@ -47,25 +39,20 @@ model = Sequential([
 
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
-# 训练
-print('开始训练...')
-history = model.fit(X_train, y_train, batch_size=128, epochs=20, validation_split=0.15, verbose=1)
+# 训练模型
+print('训练中...')
+model.fit(X_train, y_train, batch_size=128, epochs=25, validation_split=0.15, verbose=1)
 
-# 评估
-best_val_acc = max(history.history['val_accuracy'])
-print(f'\n最佳验证准确率: {best_val_acc:.4f}')
-
-# 预测
-print('预测测试集...')
+# 预测测试集
+print('预测中...')
 predictions = model.predict(X_test)
 predicted_labels = np.argmax(predictions, axis=1)
 
-# 保存提交文件
+# 创建提交文件
 submission = pd.DataFrame({
     'ImageId': range(1, len(predicted_labels) + 1),
     'Label': predicted_labels
 })
-submission.to_csv('keras_cnn_submission.csv', index=False)
+submission.to_csv('final_submission.csv', index=False)
 
-print(f'\n完成！提交文件已更新: keras_cnn_submission.csv')
-print(f'预计Kaggle准确率: {best_val_acc:.4f}')
+print('完成！提交文件: final_submission.csv')
