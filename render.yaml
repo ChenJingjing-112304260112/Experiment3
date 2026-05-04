@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: digit-recognizer
+    env: python
+    plan: starter
+    buildCommand: pip install -r requirements.txt
+    startCommand: python app.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.0
